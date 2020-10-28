@@ -8,6 +8,17 @@ Some technical details: I create or find a bathroom in my database whenever a us
 
 In order to run this locally you will need to create a Google places API key. From there you can CD into WatchTheThrone and “react-native run-ios” from the command line. First you might need to install  the React Native command line interface with “npm install -g react-native-cli”. To start the back end simply CD into backend and run “npm start”
 
- # Screenshots!
+ ## Screenshots! 
  
  Bathroom Page, pulls the bathroom's closet to you based on your location! 
+ 
+ ![bathroom page](https://github.com/SmitharyZach/FindYourThrone/blob/main/WatchTheThrone/screenshots/image%20(9).png)
+ 
+ 
+ Bathroom profile page with rating
+ 
+ ![bathroom profile page](https://github.com/SmitharyZach/FindYourThrone/blob/main/WatchTheThrone/screenshots/image%20(10).png)
+ 
+ Rating page
+ 
+  ![bathroom rating](https://github.com/SmitharyZach/FindYourThrone/blob/main/WatchTheThrone/screenshots/image%20(11).png)
