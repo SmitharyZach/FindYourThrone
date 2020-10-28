@@ -30,7 +30,7 @@ const MapSearchScreen = ({navigation}) => {
   });
 
   useEffect(() => {
-    const apiKey = '&key=AIzaSyAqkW-25QouoODMct5p1gp5VuT69LPIKQw';
+    const apiKey = '&key=YOURKEYHERE';
     const url =
       'https://maps.googleapis.com/maps/api/place/textsearch/json?query=bathroom&';
     const latlong = `location=${latitude},${longitude}&radius=1500`;
