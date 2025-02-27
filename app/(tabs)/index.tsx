@@ -1,74 +1,165 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { fetchNearbyVenues } from "@/api/placesApi";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import * as Location from 'expo-location'; // Import the Location module
+import { Text, View, StyleSheet, FlatList, ActivityIndicator, Image } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from "react";
+import { LocationObject } from "expo-location";
+import UnverifiedVenue from "@/components/UnverifiedVenue";
+import { Platform } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function Index() {
+  const [location, setLocation] = useState<LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ['googleVenues'],
+    queryFn: () => fetchNearbyVenues(location?.coords.latitude, location?.coords.longitude),
+    enabled: !!location?.coords.latitude && !!location?.coords.longitude
+  })
+  console.log("error", errorMsg)
 
-export default function HomeScreen() {
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaView edges={['bottom']} style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.emoji}>💩</Text>
+        <Text style={styles.title}>Unverified Thrones</Text>
+      </View>
+
+      {isPending && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#5D3FD3" />
+          <Text style={styles.loadingText}>Finding the nearest facilities...</Text>
+        </View>
+      )}
+
+      {isError && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Oops! {error?.message}</Text>
+          <Text style={styles.errorSubtext}>We couldn't locate any thrones nearby.</Text>
+        </View>
+      )}
+
+      {data && <FlatList
+        data={data}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <UnverifiedVenue key={item.place_id} venue={item} />
+        )}
+        keyExtractor={(item) => item.place_id}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No thrones to verify in this area!</Text>
+          </View>
+        }
+      />}
+
+      <View style={styles.decorationCircle1} />
+      <View style={styles.decorationCircle2} />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    backgroundColor: "#FFFDD0",
+    flex: 1,
+    position: 'relative',
+  },
+  headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginTop: 15,
+    marginBottom: 10,
+    marginHorizontal: 16,
   },
-  stepContainer: {
-    gap: 8,
+  emoji: {
+    fontSize: 32,
+    marginRight: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#5D3FD3',
+    fontFamily: Platform.OS === 'ios' ? 'Marker Felt' : 'normal',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#5D3FD3',
+    fontStyle: 'italic',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#5D3FD3',
+    textAlign: 'center',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  errorSubtext: {
+    fontSize: 16,
+    color: '#5D3FD3',
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+  listContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingBottom: 20,
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#5D3FD3',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  decorationCircle1: {
     position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(93, 63, 211, 0.1)',
+    top: -50,
+    right: -70,
+    zIndex: -1,
+  },
+  decorationCircle2: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    bottom: -30,
+    left: -40,
+    zIndex: -1,
   },
 });

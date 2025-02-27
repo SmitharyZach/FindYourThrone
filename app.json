@@ -9,7 +9,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.findyourthrone.app"
+
     },
     "android": {
       "adaptiveIcon": {
@@ -32,7 +34,21 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [      
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Find Your Throne to use your location.",
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.171979094835-a9vmc2dj6scdibffj8sdb04qva0dk0i0"
+        }
       ]
+
     ],
     "experiments": {
       "typedRoutes": true
