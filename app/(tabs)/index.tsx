@@ -154,6 +154,17 @@ export default function Index() {
     );
   }, [unverifiedBathrooms, verifiedBathrooms]);
 
+  const shouldShowMarkers = useMemo(() => {
+    // Check if data has finished loading (not if it exists)
+    // We're explicit checking for arrays rather than truthiness
+    const verifiedDataReady = !isPending && Array.isArray(verifiedBathrooms);
+    const unverifiedDataReady =
+      !isPending && Array.isArray(filteredUnverifiedVenues);
+
+    // Only show markers when both datasets have finished loading (even if empty)
+    return verifiedDataReady && unverifiedDataReady;
+  }, [isPending, verifiedBathrooms, filteredUnverifiedVenues]);
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
