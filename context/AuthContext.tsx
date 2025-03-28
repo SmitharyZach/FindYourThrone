@@ -10,6 +10,7 @@ const AuthContext = createContext<AuthContextType>({
     signIn: async ({ email, password }: { email: string; password: string }) => { },
     signUp: async ({ email, password }: { email: string; password: string }) => { },
     signOut: async () => { },
+    googleAuth: async (idToken: string) => { },
 });
 
 interface AuthContextType {
@@ -19,6 +20,7 @@ interface AuthContextType {
     signIn: ({ email, password }: { email: string; password: string }) => Promise<any>;
     signUp: ({ email, password }: { email: string; password: string }) => Promise<any>;
     signOut: () => Promise<void>;
+    googleAuth: (idToken: string, email: string) => Promise<any>;
 }
 
 // Auth provider component
@@ -85,13 +87,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return data;
     };
 
+    const googleAuth = async (idToken: string) => {
+        const { data, error } = await supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: idToken,
+        });
+        if (error) throw error;
+        return data;
+    };
+
     const signOut = async () => {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
     };
 
     return (
-        <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+        <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, googleAuth }}>
             {children}
         </AuthContext.Provider>
     )

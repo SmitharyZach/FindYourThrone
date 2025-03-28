@@ -1,7 +1,7 @@
 import { Stack, useRouter, usePathname } from "expo-router";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { AuthProvider, useAuth } from '../context/AuthContext';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { AuthProvider, useAuth } from "../context/AuthContext";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -19,24 +19,34 @@ function ProtectedRouteLayout() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const publicPaths = ['/login', '/signup'];
+  const publicPaths = ["/login", "/signup"];
 
   useEffect(() => {
     if (loading) return;
 
     const isPublicRoute = publicPaths.includes(pathname);
 
-    if (!user && !isPublicRoute && !pathname.includes('+not-found')) {
-      router.replace('/login');
+    if (!user && !isPublicRoute && !pathname.includes("+not-found")) {
+      router.replace("/login");
     } else if (user && isPublicRoute) {
-      router.replace('/');
+      router.replace("/");
     }
   }, [user, loading, pathname]);
 
   return (
     <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="(tabs)"
+        options={{ headerShown: false, title: "Finder" }}
+      />
       <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="unverified-bathroom"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen name="verified-bathroom" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

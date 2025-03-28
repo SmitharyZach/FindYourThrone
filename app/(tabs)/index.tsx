@@ -1,165 +1,278 @@
 import { fetchNearbyVenues } from "@/api/placesApi";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import * as Location from 'expo-location'; // Import the Location module
-import { Text, View, StyleSheet, FlatList, ActivityIndicator, Image } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import * as Location from "expo-location";
+import {
+  Text,
+  View,
+  ActivityIndicator,
+  TouchableOpacity,
+  Dimensions,
+  Image,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { LocationObject } from "expo-location";
-import UnverifiedVenue from "@/components/UnverifiedVenue";
 import { Platform } from "react-native";
+import { getNearbyBathrooms } from "@/api/bathrooms";
+import MapView, { Marker, Region, Callout } from "react-native-maps";
+
+import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import ThroneMarker from "@/components/ThroneMarker";
+import { debounce } from "lodash";
+import { styles } from "@/components/styles/mapViewStyles";
+import Legend from "@/components/map/legend";
 
 export default function Index() {
   const [location, setLocation] = useState<LocationObject | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const { isPending, isError, data, error } = useQuery({
-    queryKey: ['googleVenues'],
-    queryFn: () => fetchNearbyVenues(location?.coords.latitude, location?.coords.longitude),
-    enabled: !!location?.coords.latitude && !!location?.coords.longitude
-  })
-  console.log("error", errorMsg)
+  const [mapRegion, setMapRegion] = useState<Region | null>(null);
+  const mapRef = useRef<MapView | null>(null);
+  const queryClient = useQueryClient();
+  const { width, height } = Dimensions.get("window");
+  const ASPECT_RATIO = width / height;
+  const LATITUDE_DELTA = 0.02;
+  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+  // Add these new state variables
+  const [lastFetchedRegion, setLastFetchedRegion] = useState<Region | null>(
+    null
+  );
+  const FETCH_THRESHOLD = 1; // Distance in km to trigger new fetch
+
+  // Helper function to calculate distance between coordinates (Haversine formula)
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  };
+
+  // Function to determine if we should fetch new data
+  const shouldFetchNewData = (newRegion: Region, lastRegion: Region) => {
+    if (!lastRegion) return true;
+
+    const distance = calculateDistance(
+      newRegion.latitude,
+      newRegion.longitude,
+      lastRegion.latitude,
+      lastRegion.longitude
+    );
+
+    return distance > FETCH_THRESHOLD;
+  };
+
+  // Center map on user location
+  const centerOnUserLocation = () => {
+    if (location) {
+      const { latitude, longitude } = location.coords;
+      mapRef.current?.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        },
+        1000
+      );
+      setMapRegion({
+        latitude,
+        longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      });
+    }
+  };
+  const router = useRouter();
+  const handleRegionChangeComplete = useCallback(
+    debounce((newRegion: Region) => {
+      setMapRegion(newRegion);
+      console.log("new map region set!", newRegion);
+      console.log("last fetched region", lastFetchedRegion);
+      //
+      if (
+        lastFetchedRegion &&
+        shouldFetchNewData(newRegion, lastFetchedRegion)
+      ) {
+        console.log("Map moved significantly, fetching new data...");
+        setLastFetchedRegion(newRegion);
+        // Trigger refetch by invalidating queries
+        queryClient.invalidateQueries({ queryKey: ["googleVenues"] });
+        queryClient.invalidateQueries({ queryKey: ["verifiedBathrooms"] });
+      }
+    }, 500), // Increased debounce to 500ms for better performance
+    [lastFetchedRegion, queryClient]
+  );
+  // Query for unverified venues based on map center
+  const {
+    isPending,
+    isError,
+    data: unverifiedBathrooms,
+    error,
+  } = useQuery({
+    queryKey: ["googleVenues"],
+    queryFn: () => fetchNearbyVenues(mapRegion?.latitude, mapRegion?.longitude),
+    enabled: !!mapRegion?.latitude && !!mapRegion?.longitude,
+  });
+
+  // Query for verified bathrooms based on map center
+  const { data: verifiedBathrooms } = useQuery({
+    queryKey: ["verifiedBathrooms"],
+    queryFn: () =>
+      getNearbyBathrooms({
+        latitude: mapRegion?.latitude!,
+        longitude: mapRegion?.longitude!,
+      }),
+    enabled: !!mapRegion?.latitude && !!mapRegion?.longitude,
+  });
+
+  // Filter out unverified venues that are already in our verified list
+  const filteredUnverifiedVenues = useMemo(() => {
+    // If we don't have verified bathrooms or Google data yet, return all Google data
+    if (!verifiedBathrooms || !unverifiedBathrooms) {
+      return unverifiedBathrooms || [];
+    }
+
+    // Create a Set of Google place IDs from verified bathrooms for O(1) lookup
+    const verifiedPlaceIds = new Set(
+      verifiedBathrooms.map((bathroom) => bathroom.google_place_id)
+    );
+
+    // Filter out any unverified venues that are already in our verified list
+    return unverifiedBathrooms.filter(
+      (venue) => !verifiedPlaceIds.has(venue.place_id)
+    );
+  }, [unverifiedBathrooms, verifiedBathrooms]);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
         return;
       }
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+
+      // Set initial map region based on user's location
+      if (location) {
+        const { latitude, longitude } = location.coords;
+        setMapRegion({
+          latitude,
+          longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        });
+        setLastFetchedRegion({
+          latitude,
+          longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        });
+      }
     })();
   }, []);
 
-  return (
-    <SafeAreaView edges={['bottom']} style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.emoji}>💩</Text>
-        <Text style={styles.title}>Unverified Thrones</Text>
-      </View>
-
-      {isPending && (
+  // Initial loading state
+  if (!mapRegion) {
+    return (
+      <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#5D3FD3" />
-          <Text style={styles.loadingText}>Finding the nearest facilities...</Text>
+          <Text style={styles.loadingText}>Finding your location...</Text>
         </View>
-      )}
+      </SafeAreaView>
+    );
+  }
 
-      {isError && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Oops! {error?.message}</Text>
-          <Text style={styles.errorSubtext}>We couldn't locate any thrones nearby.</Text>
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Map Container */}
+      <View style={styles.mapContainer}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          provider={Platform.OS === "android" ? "google" : undefined}
+          initialRegion={mapRegion}
+          showsUserLocation={true}
+          showsMyLocationButton={false}
+          showsCompass={true}
+          showsScale={true}
+          onRegionChangeComplete={handleRegionChangeComplete}
+        >
+          {/* Verified Bathroom Markers */}
+          {verifiedBathrooms?.map((bathroom) => (
+            <ThroneMarker bathroom={bathroom} key={bathroom.id} />
+          ))}
+
+          {/* Unverified Bathroom Markers */}
+          {filteredUnverifiedVenues?.map((venue) => (
+            <Marker
+              key={`unverified-${venue.place_id}`}
+              coordinate={{
+                latitude: venue.location?.latitude ?? 0,
+                longitude: venue.location?.longitude ?? 0,
+              }}
+              title={venue.name}
+              description="Unverified Bathroom"
+            >
+              <View style={styles.markerContainer}>
+                <Image
+                  source={require("../../assets/images/toilet.png")}
+                  style={styles.markerImage}
+                />
+              </View>
+              <Callout
+                onPress={() =>
+                  router.push({
+                    pathname: "/unverified-bathroom",
+                    params: {
+                      id: venue.place_id,
+                      venue: JSON.stringify(venue),
+                    },
+                  })
+                }
+                tooltip
+              >
+                <View style={styles.calloutContainer}>
+                  <Text style={styles.calloutTitle}>{venue.name}</Text>
+                  <Text style={styles.calloutDescription}>
+                    Unverified Bathroom
+                  </Text>
+                  <Text style={styles.calloutSubtext}>
+                    Tap to rate and verify
+                  </Text>
+                </View>
+              </Callout>
+            </Marker>
+          ))}
+        </MapView>
+
+        <Legend />
+        {/* Current Location Button */}
+        <TouchableOpacity
+          style={styles.locationButton}
+          onPress={centerOnUserLocation}
+        >
+          <FontAwesome name="location-arrow" size={20} color="#5D3FD3" />
+        </TouchableOpacity>
+
+        {/* Map Title */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Find Your Throne!</Text>
         </View>
-      )}
-
-      {data && <FlatList
-        data={data}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-        renderItem={({ item }) => (
-          <UnverifiedVenue key={item.place_id} venue={item} />
-        )}
-        keyExtractor={(item) => item.place_id}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No thrones to verify in this area!</Text>
-          </View>
-        }
-      />}
-
-      <View style={styles.decorationCircle1} />
-      <View style={styles.decorationCircle2} />
+      </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#FFFDD0",
-    flex: 1,
-    position: 'relative',
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 10,
-    marginHorizontal: 16,
-  },
-  emoji: {
-    fontSize: 32,
-    marginRight: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#5D3FD3',
-    fontFamily: Platform.OS === 'ios' ? 'Marker Felt' : 'normal',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#5D3FD3',
-    fontStyle: 'italic',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#5D3FD3',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  errorSubtext: {
-    fontSize: 16,
-    color: '#5D3FD3',
-    textAlign: 'center',
-    opacity: 0.8,
-  },
-  listContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingBottom: 20,
-  },
-  emptyContainer: {
-    padding: 40,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#5D3FD3',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  decorationCircle1: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(93, 63, 211, 0.1)',
-    top: -50,
-    right: -70,
-    zIndex: -1,
-  },
-  decorationCircle2: {
-    position: 'absolute',
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
-    bottom: -30,
-    left: -40,
-    zIndex: -1,
-  },
-});
