@@ -28,6 +28,7 @@ export default function Index() {
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
   const mapRef = useRef<MapView | null>(null);
   const queryClient = useQueryClient();
+  const [isMapReady, setIsMapReady] = useState(false);
   const { width, height } = Dimensions.get("window");
   const ASPECT_RATIO = width / height;
   const LATITUDE_DELTA = 0.02;
@@ -56,6 +57,25 @@ export default function Index() {
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance in km
+  };
+
+  const forceRender = () => {
+    if (mapRef.current && mapRegion) {
+      // Slightly adjust the region to force a re-render
+      const microAdjustment = 0.000001;
+      const adjustedRegion = {
+        ...mapRegion,
+        latitude: mapRegion.latitude + microAdjustment,
+      };
+      mapRef.current.animateToRegion(adjustedRegion, 0);
+
+      // Reset back to original position immediately
+      setTimeout(() => {
+        if (mapRef.current) {
+          mapRef.current.animateToRegion(mapRegion, 0);
+        }
+      }, 10);
+    }
   };
 
   // Function to determine if we should fetch new data
@@ -160,11 +180,11 @@ export default function Index() {
     const verifiedDataReady = !isPending && Array.isArray(verifiedBathrooms);
     const unverifiedDataReady =
       !isPending && Array.isArray(filteredUnverifiedVenues);
+    forceRender();
 
     // Only show markers when both datasets have finished loading (even if empty)
     return verifiedDataReady && unverifiedDataReady;
   }, [isPending, verifiedBathrooms, filteredUnverifiedVenues]);
-  console.log("test");
 
   useEffect(() => {
     (async () => {
@@ -180,18 +200,15 @@ export default function Index() {
       // Set initial map region based on user's location
       if (location) {
         const { latitude, longitude } = location.coords;
-        setMapRegion({
+        const initialRegion = {
           latitude,
           longitude,
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA,
-        });
-        setLastFetchedRegion({
-          latitude,
-          longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        });
+        };
+        console.log("mounted with regions", initialRegion);
+        setMapRegion(initialRegion);
+        setLastFetchedRegion(initialRegion);
       }
     })();
   }, []);
@@ -208,6 +225,11 @@ export default function Index() {
     );
   }
 
+  console.log("should show markers", shouldShowMarkers);
+  console.log("is map ready", isMapReady);
+  console.log("verified", verifiedBathrooms);
+  console.log("unverified", filteredUnverifiedVenues);
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Map Container */}
@@ -222,53 +244,66 @@ export default function Index() {
           showsCompass={true}
           showsScale={true}
           onRegionChangeComplete={handleRegionChangeComplete}
+          onMapReady={() => {
+            setIsMapReady(true);
+            // Force an immediate fetch of data when map is ready
+            if (mapRegion) {
+              queryClient.invalidateQueries({ queryKey: ["googleVenues"] });
+              queryClient.invalidateQueries({
+                queryKey: ["verifiedBathrooms"],
+              });
+            }
+          }}
         >
           {/* Verified Bathroom Markers */}
-          {verifiedBathrooms?.map((bathroom) => (
-            <ThroneMarker bathroom={bathroom} key={bathroom.id} />
-          ))}
-
+          {shouldShowMarkers &&
+            isMapReady &&
+            verifiedBathrooms?.map((bathroom) => (
+              <ThroneMarker bathroom={bathroom} key={bathroom.id} />
+            ))}
           {/* Unverified Bathroom Markers */}
-          {filteredUnverifiedVenues?.map((venue) => (
-            <Marker
-              key={`unverified-${venue.place_id}`}
-              coordinate={{
-                latitude: venue.location?.latitude ?? 0,
-                longitude: venue.location?.longitude ?? 0,
-              }}
-              title={venue.name}
-              description="Unverified Bathroom"
-            >
-              <View style={styles.markerContainer}>
-                <Image
-                  source={require("../../assets/images/toilet.png")}
-                  style={styles.markerImage}
-                />
-              </View>
-              <Callout
-                onPress={() =>
-                  router.push({
-                    pathname: "/unverified-bathroom",
-                    params: {
-                      id: venue.place_id,
-                      venue: JSON.stringify(venue),
-                    },
-                  })
-                }
-                tooltip
+          {shouldShowMarkers &&
+            isMapReady &&
+            filteredUnverifiedVenues?.map((venue) => (
+              <Marker
+                key={`unverified-${venue.place_id}`}
+                coordinate={{
+                  latitude: venue.location?.latitude ?? 0,
+                  longitude: venue.location?.longitude ?? 0,
+                }}
+                title={venue.name}
+                description="Unverified Bathroom"
               >
-                <View style={styles.calloutContainer}>
-                  <Text style={styles.calloutTitle}>{venue.name}</Text>
-                  <Text style={styles.calloutDescription}>
-                    Unverified Bathroom
-                  </Text>
-                  <Text style={styles.calloutSubtext}>
-                    Tap to rate and verify
-                  </Text>
+                <View style={styles.markerContainer}>
+                  <Image
+                    source={require("../../assets/images/toilet.png")}
+                    style={styles.markerImage}
+                  />
                 </View>
-              </Callout>
-            </Marker>
-          ))}
+                <Callout
+                  onPress={() =>
+                    router.push({
+                      pathname: "/unverified-bathroom",
+                      params: {
+                        id: venue.place_id,
+                        venue: JSON.stringify(venue),
+                      },
+                    })
+                  }
+                  tooltip
+                >
+                  <View style={styles.calloutContainer}>
+                    <Text style={styles.calloutTitle}>{venue.name}</Text>
+                    <Text style={styles.calloutDescription}>
+                      Unverified Bathroom
+                    </Text>
+                    <Text style={styles.calloutSubtext}>
+                      Tap to rate and verify
+                    </Text>
+                  </View>
+                </Callout>
+              </Marker>
+            ))}
         </MapView>
 
         <Legend />
