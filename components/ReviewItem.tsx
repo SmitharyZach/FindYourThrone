@@ -96,13 +96,6 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ review }) => {
       {review.review_text && (
         <Text style={styles.reviewComment}>{review.review_text}</Text>
       )}
-
-      {/* User info if available */}
-      <View style={styles.reviewFooter}>
-        <Text style={styles.reviewerName}>
-          {review.profiles?.username || "Anonymous User"}
-        </Text>
-      </View>
     </View>
   );
 };
