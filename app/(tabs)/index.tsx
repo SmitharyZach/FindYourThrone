@@ -164,6 +164,7 @@ export default function Index() {
     // Only show markers when both datasets have finished loading (even if empty)
     return verifiedDataReady && unverifiedDataReady;
   }, [isPending, verifiedBathrooms, filteredUnverifiedVenues]);
+  console.log("test");
 
   useEffect(() => {
     (async () => {
