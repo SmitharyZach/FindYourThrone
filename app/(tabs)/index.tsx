@@ -94,24 +94,8 @@ export default function Index() {
 
   // Center map on user location
   const centerOnUserLocation = () => {
-    if (location) {
-      const { latitude, longitude } = location.coords;
-      mapRef.current?.animateToRegion(
-        {
-          latitude,
-          longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        },
-        1000
-      );
-      setMapRegion({
-        latitude,
-        longitude,
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      });
-    }
+    queryClient.invalidateQueries({ queryKey: ["googleVenues"] });
+    queryClient.invalidateQueries({ queryKey: ["verifiedBathrooms"] });
   };
   const router = useRouter();
   const handleRegionChangeComplete = useCallback(
@@ -127,8 +111,10 @@ export default function Index() {
         console.log("Map moved significantly, fetching new data...");
         setLastFetchedRegion(newRegion);
         // Trigger refetch by invalidating queries
-        queryClient.invalidateQueries({ queryKey: ["googleVenues"] });
-        queryClient.invalidateQueries({ queryKey: ["verifiedBathrooms"] });
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ["googleVenues"] });
+          queryClient.invalidateQueries({ queryKey: ["verifiedBathrooms"] });
+        }, 200);
       }
     }, 500), // Increased debounce to 500ms for better performance
     [lastFetchedRegion, queryClient]
@@ -224,14 +210,8 @@ export default function Index() {
       </SafeAreaView>
     );
   }
-
-  console.log("should show markers", shouldShowMarkers);
-  console.log("is map ready", isMapReady);
-  console.log("verified", verifiedBathrooms);
-  console.log("unverified", filteredUnverifiedVenues);
-
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Map Container */}
       <View style={styles.mapContainer}>
         <MapView
@@ -312,7 +292,7 @@ export default function Index() {
           style={styles.locationButton}
           onPress={centerOnUserLocation}
         >
-          <FontAwesome name="location-arrow" size={20} color="#5D3FD3" />
+          <Text style={styles.refresh}>Refresh</Text>
         </TouchableOpacity>
 
         {/* Map Title */}
@@ -320,6 +300,6 @@ export default function Index() {
           <Text style={styles.title}>Find Your Throne!</Text>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
