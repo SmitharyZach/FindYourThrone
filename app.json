@@ -56,6 +56,14 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.171979094835-a9vmc2dj6scdibffj8sdb04qva0dk0i0"
         }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#5D3FD3",
+          "image": "./assets/images/crown1.png",
+          "imageWidth": 200
+        }
       ]
     ],
     "experiments": {

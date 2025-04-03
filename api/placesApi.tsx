@@ -36,6 +36,7 @@ export const fetchNearbyVenues = async (
       "rest_stop",
       "public_bathroom",
       "restaurant",
+      "coffee_shop",
     ],
     maxResultCount: 20,
     rankPreference: "DISTANCE",

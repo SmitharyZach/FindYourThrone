@@ -66,7 +66,7 @@ export const styles = StyleSheet.create({
   },
   legendContainer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 50,
     left: 20,
     backgroundColor: "white",
     borderRadius: 8,
@@ -96,12 +96,12 @@ export const styles = StyleSheet.create({
   },
   locationButton: {
     position: "absolute",
-    bottom: 20,
+    bottom: 50,
     right: 20,
     backgroundColor: "white",
-    width: 50,
+    width: 100,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -115,7 +115,7 @@ export const styles = StyleSheet.create({
   },
   titleContainer: {
     position: "absolute",
-    top: 40,
+    top: 85,
     left: 10,
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 20,
@@ -137,6 +137,12 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
+    fontWeight: "bold",
+    color: "#5D3FD3",
+    fontFamily: Platform.OS === "ios" ? "Marker Felt" : "normal",
+  },
+  refresh: {
+    fontSize: 18,
     fontWeight: "bold",
     color: "#5D3FD3",
     fontFamily: Platform.OS === "ios" ? "Marker Felt" : "normal",
