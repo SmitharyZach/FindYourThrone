@@ -203,7 +203,7 @@ Please describe your issue here:
       </LinearGradient>
 
       <View style={styles.versionContainer}>
-        <Text style={styles.versionText}>Find Your Throne v1.0.2</Text>
+        <Text style={styles.versionText}>Find Your Throne v1.1.1</Text>
       </View>
 
       <View style={styles.decorationCircle1} />
