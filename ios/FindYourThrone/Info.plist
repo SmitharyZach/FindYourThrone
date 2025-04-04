@@ -56,11 +56,11 @@
     <key>NSCameraUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your camera</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
+    <string>Find Your Throne uses your location to identify nearby public restrooms, calculate the distance to each facility, and provide directions even when the app is in the background, ensuring you can find facilities quickly in urgent situations.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Allow Find Your Throne to use your location.</string>
+    <string>Find Your Throne uses your location to identify nearby public restrooms, calculate the distance to each facility, and provide directions to help you quickly find accessible bathrooms when needed.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
     <key>NSPhotoLibraryUsageDescription</key>
