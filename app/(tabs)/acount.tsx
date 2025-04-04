@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase"; // Adjust path if needed
+import { deleteUser } from "@/api/user";
 
 export default function AccountScreen() {
   const { user, signOut } = useAuth();
@@ -60,6 +61,33 @@ export default function AccountScreen() {
     }
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Warning: This action cannot be undone. All your account data and reviews will be permanently deleted.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete Account",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteUser(user?.id ?? "");
+              await signOut();
+              router.push("/login");
+            } catch (error) {
+              console.error("Delete account error:", error);
+              Alert.alert(
+                "Delete Account Error",
+                "There was a problem deleting your account. Please try again or contact support."
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleContactSupport = async () => {
     const email = "znathanielsmith@gmail.com";
     const subject = "Find Your Throne - Support Request";
@@ -104,10 +132,6 @@ Please describe your issue here:
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Account</Text>
-      </View>
-
       {/* Profile Card */}
       <LinearGradient
         colors={["#ffffff", "#f8fafc"]}
@@ -202,6 +226,14 @@ Please describe your issue here:
         </Pressable>
       </LinearGradient>
 
+      {/* Delete Account Button */}
+      <Pressable
+        onPress={handleDeleteAccount}
+        style={styles.deleteAccountButton}
+      >
+        <Text style={styles.deleteAccountText}>Delete Account</Text>
+      </Pressable>
+
       <View style={styles.versionContainer}>
         <Text style={styles.versionText}>Find Your Throne v1.1.1</Text>
       </View>
@@ -229,6 +261,7 @@ const styles = StyleSheet.create({
   },
   card: {
     margin: 8,
+    marginTop: 24,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -369,6 +402,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginLeft: 8,
+  },
+  deleteAccountButton: {
+    alignSelf: "center",
+    marginTop: 16,
+    marginBottom: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  deleteAccountText: {
+    color: "#FF0000",
+    fontSize: 14,
+    fontWeight: "600",
   },
   versionContainer: {
     alignItems: "center",
