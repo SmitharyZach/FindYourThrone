@@ -21,6 +21,7 @@ import { Venue } from "@/api/placesApi";
 import { User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { openMaps } from "@/utils/mapUtils";
+import { useRouter } from "expo-router";
 
 export type BathroomRatingData = {
   clean: number;
@@ -48,6 +49,7 @@ export default function BathroomRatingForm({
   onSubmitSuccess,
 }: BathroomRatingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<BathroomRatingData>({
@@ -114,9 +116,10 @@ export default function BathroomRatingForm({
         .single();
 
       if (bathroomError) {
+        console.log("had bathrrom error");
         throw new Error(`Error creating bathroom: ${bathroomError.message}`);
       }
-
+      console.log("bathroom created", bathroom);
       // Then create the rating
       const { error: ratingError, data: rating } = await supabase
         .from("ratings")
@@ -132,16 +135,15 @@ export default function BathroomRatingForm({
         })
         .select()
         .single();
-
+      console.log("rating made", rating);
       if (ratingError) {
+        console.log("had rating error");
         throw new Error(`Error creating rating: ${ratingError.message}`);
       }
-
+      console.log("trying");
       queryClient.invalidateQueries();
-
-      // Call the onSubmit prop with the success
-      onSubmitSuccess();
-      // Show success message
+      router.push("/(tabs)");
+      // Call the onSubmit prop with the success      // Show success message
       Alert.alert("Success! 🚽", "Your throne review has been recorded!");
     } catch (error) {
       console.error("Error submitting bathroom rating:", error);
@@ -154,124 +156,127 @@ export default function BathroomRatingForm({
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.keyboardAvoidingContainer}
-      keyboardVerticalOffset={90} // Adjust this value based on your header height
+    <ScrollView
+      contentContainerStyle={styles.scrollViewContent}
+      keyboardShouldPersistTaps="handled"
+      bounces={false}
+      showsVerticalScrollIndicator={true}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollViewContent}
-        keyboardShouldPersistTaps="handled"
-        bounces={false}
-        showsVerticalScrollIndicator={true}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
-            <View style={styles.venueInfoCard}>
-              <Text style={styles.venueName}>{venue?.name}</Text>
-              <Text style={styles.venueAddress}>{venue?.formattedAddress}</Text>
-              <Pressable
-                onPress={handleOpenMaps}
-                style={[styles.actionButton, styles.secondaryButton]}
-              >
-                <Text style={styles.secondaryButtonText}>📍 Directions</Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.ratingSection}>
-              <Text style={styles.sectionTitle}>
-                How would you rate this throne?
-              </Text>
-              <RatingPicker
-                value={formData.clean}
-                onChange={(value) => updateField("clean", value)}
-                title="Clean"
-              />
-
-              <RatingPicker
-                value={formData.functional}
-                onChange={(value) => updateField("functional", value)}
-                title="Functional"
-              />
-              <RatingPicker
-                value={formData.privacy}
-                onChange={(value) => updateField("privacy", value)}
-                title="Privacy"
-              />
-              <RatingPicker
-                value={formData.stocked}
-                onChange={(value) => updateField("stocked", value)}
-                title="Well Stocked"
-              />
-
-              <View style={styles.divider} />
-
-              <Text style={styles.subsectionTitle}>Bathroom Details</Text>
-
-              <ToggleOption
-                label="Gender Neutral Bathroom?"
-                value={formData.isGenderNeutral}
-                onToggle={() =>
-                  updateField("isGenderNeutral", !formData.isGenderNeutral)
-                }
-                id="isGenderNeutral"
-              />
-
-              <ToggleOption
-                label="Purchase Required to Use?"
-                value={formData.purchaseRequired}
-                onToggle={() =>
-                  updateField("purchaseRequired", !formData.purchaseRequired)
-                }
-                id="purchaseRequired"
-              />
-
-              <ToggleOption
-                label="Key Required for Use?"
-                value={formData.keyRequired}
-                onToggle={() =>
-                  updateField("keyRequired", !formData.keyRequired)
-                }
-                id="keyRequired"
-              />
-
-              <View style={styles.codeContainer}>
-                <Text style={styles.codeLabel}>Bathroom Code (if any):</Text>
-                <TextInput
-                  style={styles.codeInput}
-                  placeholder="Enter code here..."
-                  placeholderTextColor="#9879E9"
-                  value={formData.bathroomCode}
-                  onChangeText={(value) => updateField("bathroomCode", value)}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.notesContainer}>
-                <Text style={styles.notesLabel}>Throne Notes:</Text>
-                <TextInput
-                  style={styles.notesInput}
-                  multiline
-                  numberOfLines={4}
-                  placeholder="Share your royal flush of thoughts..."
-                  placeholderTextColor="#9879E9"
-                  value={formData.notes}
-                  onChangeText={(value) => updateField("notes", value)}
-                />
-              </View>
-            </View>
-
-            <Pressable style={styles.submitButton} onPress={handleSubmit}>
-              <Text style={styles.submitButtonText}>{submitButtonText}</Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View>
+          <View style={styles.venueInfoCard}>
+            <Text style={styles.venueName}>{venue?.name}</Text>
+            <Text style={styles.venueAddress}>{venue?.formattedAddress}</Text>
+            <Pressable
+              onPress={handleOpenMaps}
+              style={[styles.actionButton, styles.secondaryButton]}
+            >
+              <Text style={styles.secondaryButtonText}>📍 Directions</Text>
             </Pressable>
-
-            {/* Extra padding at the bottom to ensure scrollability when keyboard is up */}
-            <View style={styles.bottomPadding} />
           </View>
-        </TouchableWithoutFeedback>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+          <View style={styles.ratingSection}>
+            <Text style={styles.sectionTitle}>
+              How would you rate this throne?
+            </Text>
+            <RatingPicker
+              value={formData.clean}
+              onChange={(value) => updateField("clean", value)}
+              title="Clean"
+            />
+
+            <RatingPicker
+              value={formData.functional}
+              onChange={(value) => updateField("functional", value)}
+              title="Functional"
+            />
+            <RatingPicker
+              value={formData.privacy}
+              onChange={(value) => updateField("privacy", value)}
+              title="Privacy"
+            />
+            <RatingPicker
+              value={formData.stocked}
+              onChange={(value) => updateField("stocked", value)}
+              title="Well Stocked"
+            />
+
+            <View style={styles.divider} />
+
+            <Text style={styles.subsectionTitle}>Bathroom Details</Text>
+
+            <ToggleOption
+              label="Gender Neutral Bathroom?"
+              value={formData.isGenderNeutral}
+              onToggle={() =>
+                updateField("isGenderNeutral", !formData.isGenderNeutral)
+              }
+              id="isGenderNeutral"
+            />
+
+            <ToggleOption
+              label="Purchase Required to Use?"
+              value={formData.purchaseRequired}
+              onToggle={() =>
+                updateField("purchaseRequired", !formData.purchaseRequired)
+              }
+              id="purchaseRequired"
+            />
+
+            <ToggleOption
+              label="Key Required for Use?"
+              value={formData.keyRequired}
+              onToggle={() => updateField("keyRequired", !formData.keyRequired)}
+              id="keyRequired"
+            />
+
+            <View style={styles.codeContainer}>
+              <Text style={styles.codeLabel}>Bathroom Code (if any):</Text>
+              <TextInput
+                style={styles.codeInput}
+                placeholder="Enter code here..."
+                placeholderTextColor="#9879E9"
+                value={formData.bathroomCode}
+                onChangeText={(value) => updateField("bathroomCode", value)}
+              />
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.notesContainer}>
+              <Text style={styles.notesLabel}>Throne Notes:</Text>
+              <TextInput
+                style={styles.notesInput}
+                multiline
+                numberOfLines={4}
+                placeholder="Share your royal flush of thoughts..."
+                placeholderTextColor="#9879E9"
+                value={formData.notes}
+                onChangeText={(value) => updateField("notes", value)}
+              />
+            </View>
+          </View>
+
+          <Pressable
+            style={[
+              styles.submitButton,
+              isSubmitting && styles.submitButtonDisabled,
+            ]}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <Text style={styles.submitButtonText}>Submitting...</Text>
+            ) : (
+              <Text style={styles.submitButtonText}>{submitButtonText}</Text>
+            )}
+          </Pressable>
+
+          {/* Extra padding at the bottom to ensure scrollability when keyboard is up */}
+          <View style={styles.bottomPadding} />
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   );
 }
 
@@ -284,7 +289,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   bottomPadding: {
-    height: 50, // Extra padding at the bottom
+    height: 250, // Extra padding at the bottom
   },
   venueInfoCard: {
     backgroundColor: "#FFD700",
@@ -481,5 +486,9 @@ const styles = StyleSheet.create({
     color: "#5D3FD3", // Primary blue color for the text
     fontWeight: "bold",
     fontSize: 14,
+  },
+  submitButtonDisabled: {
+    backgroundColor: "#E5C100", // Darker shade of gold
+    opacity: 0.7,
   },
 });

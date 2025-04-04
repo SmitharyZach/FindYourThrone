@@ -50,7 +50,7 @@ export default function AccountScreen() {
   const handleLogout = async () => {
     try {
       await signOut();
-      router.replace("/login");
+      router.push("/login");
     } catch (error) {
       Alert.alert(
         "Logout Error",
@@ -203,7 +203,7 @@ Please describe your issue here:
       </LinearGradient>
 
       <View style={styles.versionContainer}>
-        <Text style={styles.versionText}>Find Your Throne v1.0.0</Text>
+        <Text style={styles.versionText}>Find Your Throne v1.0.2</Text>
       </View>
 
       <View style={styles.decorationCircle1} />

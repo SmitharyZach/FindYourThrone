@@ -16,9 +16,7 @@ export default function UnverifiedBathroomScreen() {
   const venue = params.venue ? JSON.parse(params.venue as string) : null;
   const router = useRouter();
 
-  const handleRatingSubmit = () => {
-    router.push("/");
-  };
+  const handleRatingSubmit = () => {};
 
   return (
     <SafeAreaView style={styles.container}>
