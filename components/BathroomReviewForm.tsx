@@ -113,81 +113,75 @@ export default function BathroomReviewForm({
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.keyboardAvoidingContainer}
-      keyboardVerticalOffset={90} // Adjust this value based on your header height
+    <ScrollView
+      contentContainerStyle={styles.scrollViewContent}
+      keyboardShouldPersistTaps="handled"
+      bounces={false}
+      showsVerticalScrollIndicator={true}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollViewContent}
-        keyboardShouldPersistTaps="handled"
-        bounces={false}
-        showsVerticalScrollIndicator={true}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
-            <View style={styles.ratingSection}>
-              <Text style={styles.sectionTitle}>
-                How would you rate this throne?
-              </Text>
-              <RatingPicker
-                value={formData.clean}
-                onChange={(value) => updateField("clean", value)}
-                title="Clean"
-              />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View>
+          <View style={styles.ratingSection}>
+            <Text style={styles.sectionTitle}>
+              How would you rate this throne?
+            </Text>
+            <RatingPicker
+              value={formData.clean}
+              onChange={(value) => updateField("clean", value)}
+              title="Clean"
+            />
 
-              <RatingPicker
-                value={formData.functional}
-                onChange={(value) => updateField("functional", value)}
-                title="Functional"
-              />
-              <RatingPicker
-                value={formData.privacy}
-                onChange={(value) => updateField("privacy", value)}
-                title="Privacy"
-              />
-              <RatingPicker
-                value={formData.stocked}
-                onChange={(value) => updateField("stocked", value)}
-                title="Well Stocked"
-              />
+            <RatingPicker
+              value={formData.functional}
+              onChange={(value) => updateField("functional", value)}
+              title="Functional"
+            />
+            <RatingPicker
+              value={formData.privacy}
+              onChange={(value) => updateField("privacy", value)}
+              title="Privacy"
+            />
+            <RatingPicker
+              value={formData.stocked}
+              onChange={(value) => updateField("stocked", value)}
+              title="Well Stocked"
+            />
 
-              <View style={styles.divider} />
+            <View style={styles.divider} />
 
-              <View style={styles.notesContainer}>
-                <Text style={styles.notesLabel}>Throne Notes:</Text>
-                <TextInput
-                  style={styles.notesInput}
-                  multiline
-                  numberOfLines={4}
-                  placeholder="Share your royal flush of thoughts..."
-                  placeholderTextColor="#9879E9"
-                  value={formData.notes}
-                  onChangeText={(value) => updateField("notes", value)}
-                />
-              </View>
+            <View style={styles.notesContainer}>
+              <Text style={styles.notesLabel}>Throne Notes:</Text>
+              <TextInput
+                style={styles.notesInput}
+                multiline
+                numberOfLines={4}
+                placeholder="Share your royal flush of thoughts..."
+                placeholderTextColor="#9879E9"
+                value={formData.notes}
+                onChangeText={(value) => updateField("notes", value)}
+              />
             </View>
-
-            <Pressable
-              style={
-                isSubmitting
-                  ? [styles.submitButton, styles.submitButtonDisabled]
-                  : styles.submitButton
-              }
-              onPress={handleSubmit}
-              disabled={isSubmitting}
-            >
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? "SUBMITTING..." : submitButtonText}
-              </Text>
-            </Pressable>
-
-            {/* Extra padding at the bottom to ensure scrollability when keyboard is up */}
-            <View style={styles.bottomPadding} />
           </View>
-        </TouchableWithoutFeedback>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+          <Pressable
+            style={
+              isSubmitting
+                ? [styles.submitButton, styles.submitButtonDisabled]
+                : styles.submitButton
+            }
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+          >
+            <Text style={styles.submitButtonText}>
+              {isSubmitting ? "SUBMITTING..." : submitButtonText}
+            </Text>
+          </Pressable>
+
+          {/* Extra padding at the bottom to ensure scrollability when keyboard is up */}
+          <View style={styles.bottomPadding} />
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   );
 }
 
