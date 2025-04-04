@@ -47,7 +47,8 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Allow Find Your Throne to use your location.",
+          "locationWhenInUsePermission": "Find Your Throne uses your location to identify nearby public restrooms, calculate the distance to each facility, and provide directions to help you quickly find accessible bathrooms when needed.",
+          "locationAlwaysAndWhenInUsePermission": "Find Your Throne uses your location to identify nearby public restrooms, calculate the distance to each facility, and provide directions even when the app is in the background, ensuring you can find facilities quickly in urgent situations.",
           "isAndroidForegroundServiceEnabled": true
         }
       ],
