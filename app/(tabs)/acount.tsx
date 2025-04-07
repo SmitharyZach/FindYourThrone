@@ -133,41 +133,43 @@ Please describe your issue here:
   return (
     <ScrollView style={styles.container}>
       {/* Profile Card */}
-      <LinearGradient
-        colors={["#ffffff", "#f8fafc"]}
-        style={styles.card}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.profileSection}>
-          <View style={styles.profileIconContainer}>
-            <Ionicons name="person-circle" size={80} color="#5D3FD3" />
-          </View>
+      {user && (
+        <LinearGradient
+          colors={["#ffffff", "#f8fafc"]}
+          style={styles.card}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.profileSection}>
+            <View style={styles.profileIconContainer}>
+              <Ionicons name="person-circle" size={80} color="#5D3FD3" />
+            </View>
 
-          <View style={styles.profileInfo}>
-            <Text style={styles.emailLabel}>Email Address</Text>
-            <Text style={styles.emailValue}>
-              {user?.email || "Not available"}
-            </Text>
+            <View style={styles.profileInfo}>
+              <Text style={styles.emailLabel}>Email Address</Text>
+              <Text style={styles.emailValue}>
+                {user?.email || "Not available"}
+              </Text>
 
-            <View style={styles.accountBadge}>
-              <Ionicons name="shield-checkmark" size={14} color="#FFFFFF" />
-              <Text style={styles.accountBadgeText}>VERIFIED USER</Text>
+              <View style={styles.accountBadge}>
+                <Ionicons name="shield-checkmark" size={14} color="#FFFFFF" />
+                <Text style={styles.accountBadgeText}>VERIFIED USER</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        {/* Stats Section */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Ionicons name="star" size={24} color="#F59E0B" />
-            <Text style={styles.statValue}>{reviewCount}</Text>
-            <Text style={styles.statLabel}>Reviews</Text>
+          {/* Stats Section */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statCard}>
+              <Ionicons name="star" size={24} color="#F59E0B" />
+              <Text style={styles.statValue}>{reviewCount}</Text>
+              <Text style={styles.statLabel}>Reviews</Text>
+            </View>
           </View>
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+      )}
 
       {/* Contact Support Button */}
       <LinearGradient
@@ -222,17 +224,19 @@ Please describe your issue here:
           ]}
         >
           <Ionicons name="log-out" size={18} color="#FFFFFF" />
-          <Text style={styles.logoutText}>Log Out</Text>
+          <Text style={styles.logoutText}>{user ? "Log Out" : "Sign Up"}</Text>
         </Pressable>
       </LinearGradient>
 
       {/* Delete Account Button */}
-      <Pressable
-        onPress={handleDeleteAccount}
-        style={styles.deleteAccountButton}
-      >
-        <Text style={styles.deleteAccountText}>Delete Account</Text>
-      </Pressable>
+      {user && (
+        <Pressable
+          onPress={handleDeleteAccount}
+          style={styles.deleteAccountButton}
+        >
+          <Text style={styles.deleteAccountText}>Delete Account</Text>
+        </Pressable>
+      )}
 
       <View style={styles.versionContainer}>
         <Text style={styles.versionText}>Find Your Throne v1.1.1</Text>

@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.findyourthrone.app",
       "config": {
         "googleMapsApiKey": "AIzaSyChKYp6K_zXCLn34DxJusqNmCVwhZ33zDU"

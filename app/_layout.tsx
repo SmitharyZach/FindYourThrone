@@ -19,19 +19,7 @@ function ProtectedRouteLayout() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const publicPaths = ["/login", "/signup"];
-
-  useEffect(() => {
-    if (loading) return;
-
-    const isPublicRoute = publicPaths.includes(pathname);
-
-    if (!user && !isPublicRoute && !pathname.includes("+not-found")) {
-      router.replace("/login");
-    } else if (user && isPublicRoute) {
-      router.replace("/");
-    }
-  }, [user, loading, pathname]);
+  const publicPaths = ["/login", "/signup", "(tabs)/"];
 
   return (
     <Stack>

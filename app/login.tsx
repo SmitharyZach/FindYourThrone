@@ -15,6 +15,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GoogleLogin from "@/components/GoogleLogin";
+import { useRouter } from "expo-router";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ const LoginScreen = () => {
   const [isLogin, setIsLogin] = useState(false); // Toggle between login/signup
   const { signIn, signUp } = useAuth();
   const buttonScale = new Animated.Value(1);
+  const router = useRouter();
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -74,7 +76,7 @@ const LoginScreen = () => {
           <View style={styles.formCard}>
             <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
             <GoogleLogin />
-            <View style={styles.inputContainer}>
+            <View style={styles.emailContainer}>
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -117,6 +119,9 @@ const LoginScreen = () => {
                   ? "Need an account? Sign Up"
                   : "Already have an account? Sign In"}
               </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/(tabs)")}>
+              <Text style={styles.signUpLaterText}>Sign up Later</Text>
             </TouchableOpacity>
           </View>
 
@@ -192,7 +197,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#FFD700",
     overflow: "hidden",
-    marginTop: 10,
+    marginTop: 0,
+  },
+  emailContainer: {
+    backgroundColor: "#FFFDD0",
+    borderRadius: 12,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#FFD700",
+    overflow: "hidden",
+    marginTop: 15,
   },
   input: {
     padding: 15,
@@ -200,6 +214,21 @@ const styles = StyleSheet.create({
     color: "#5D3FD3",
   },
   button: {
+    backgroundColor: "#FFD700",
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 10,
+    shadowColor: "#5D3FD3",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  signUpLaterButton: {
     backgroundColor: "#FFD700",
     padding: 15,
     borderRadius: 12,
@@ -223,6 +252,11 @@ const styles = StyleSheet.create({
     color: "#5D3FD3",
     textAlign: "center",
     marginTop: 15,
+    fontWeight: "500",
+  },
+  signUpLaterText: {
+    textAlign: "center",
+    marginTop: 24,
     fontWeight: "500",
   },
   decorationCircle1: {
