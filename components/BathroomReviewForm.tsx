@@ -17,6 +17,7 @@ import RatingPicker from "./RatingPicker";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 
 export type BathroomReviewData = {
   clean: number;
@@ -41,6 +42,7 @@ export default function BathroomReviewForm({
 }: BathroomReviewFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<BathroomReviewData>({
     clean: initialValues.clean || 0,
@@ -163,19 +165,36 @@ export default function BathroomReviewForm({
             </View>
           </View>
 
-          <Pressable
-            style={
-              isSubmitting
-                ? [styles.submitButton, styles.submitButtonDisabled]
-                : styles.submitButton
-            }
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-          >
-            <Text style={styles.submitButtonText}>
-              {isSubmitting ? "SUBMITTING..." : submitButtonText}
-            </Text>
-          </Pressable>
+          {user ? (
+            <Pressable
+              style={
+                isSubmitting
+                  ? [styles.submitButton, styles.submitButtonDisabled]
+                  : styles.submitButton
+              }
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+            >
+              <Text style={styles.submitButtonText}>
+                {isSubmitting ? "SUBMITTING..." : submitButtonText}
+              </Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={
+                isSubmitting
+                  ? [styles.submitButton, styles.submitButtonDisabled]
+                  : styles.submitButton
+              }
+              onPress={() => {
+                router.push("/login"); // Redirect to login if user is not authenticated
+              }}
+            >
+              <Text style={styles.submitButtonText}>
+                Sign up to submit your review! 🚽
+              </Text>
+            </Pressable>
+          )}
 
           {/* Extra padding at the bottom to ensure scrollability when keyboard is up */}
           <View style={styles.bottomPadding} />

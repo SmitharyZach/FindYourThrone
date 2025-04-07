@@ -256,22 +256,32 @@ export default function BathroomRatingForm({
               />
             </View>
           </View>
-
-          <Pressable
-            style={[
-              styles.submitButton,
-              isSubmitting && styles.submitButtonDisabled,
-            ]}
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <Text style={styles.submitButtonText}>Submitting...</Text>
-            ) : (
-              <Text style={styles.submitButtonText}>{submitButtonText}</Text>
-            )}
-          </Pressable>
-
+          {user ? (
+            <Pressable
+              style={[
+                styles.submitButton,
+                isSubmitting && styles.submitButtonDisabled,
+              ]}
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <Text style={styles.submitButtonText}>Submitting...</Text>
+              ) : (
+                <Text style={styles.submitButtonText}>{submitButtonText}</Text>
+              )}
+            </Pressable>
+          ) : (
+            <Pressable
+              style={[
+                styles.submitButton,
+                isSubmitting && styles.submitButtonDisabled,
+              ]}
+              onPress={() => router.push("/login")}
+            >
+              <Text style={styles.submitButtonText}>Sign Up to Review!</Text>
+            </Pressable>
+          )}
           {/* Extra padding at the bottom to ensure scrollability when keyboard is up */}
           <View style={styles.bottomPadding} />
         </View>
