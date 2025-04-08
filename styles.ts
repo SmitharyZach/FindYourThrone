@@ -207,6 +207,23 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
   },
+  codeRow: {
+    flexDirection: "row",
+    marginBottom: 16,
+    justifyContent: "center",
+  },
+  codeLabel: {
+    width: 145,
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#5D3FD3",
+  },
+  codeValue: {
+    flex: 1,
+    fontSize: 18,
+    color: "#333",
+    fontWeight: "bold",
+  },
   description: {
     fontSize: 15,
     color: "#444",

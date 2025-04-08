@@ -271,6 +271,13 @@ export default function VerifiedBathroomScreen() {
             <Text style={styles.cardTitle}>Features</Text>
             <View style={styles.divider} />
           </View>
+
+          {bathroom?.code && (
+            <View style={styles.codeRow}>
+              <Text style={styles.codeLabel}>Bathroom Code:</Text>
+              <Text style={styles.codeValue}>{bathroom.code}</Text>
+            </View>
+          )}
           <View style={styles.featuresGrid}>
             {bathroomData.features.map((feature, index) => (
               <FeatureBadge
@@ -303,13 +310,6 @@ export default function VerifiedBathroomScreen() {
             <Text style={styles.infoLabel}>Status</Text>
             <Text style={styles.infoValue}>{bathroomData.status}</Text>
           </View>
-
-          {bathroom?.code && (
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Access Code</Text>
-              <Text style={styles.infoValue}>{bathroom.code}</Text>
-            </View>
-          )}
         </View>
 
         {/* Bottom spacing */}
