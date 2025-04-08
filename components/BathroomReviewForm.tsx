@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   bottomPadding: {
-    height: 50, // Extra padding at the bottom
+    height: 200, // Extra padding at the bottom
   },
   venueInfoCard: {
     backgroundColor: "#FFD700",
