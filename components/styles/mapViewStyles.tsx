@@ -116,11 +116,13 @@ export const styles = StyleSheet.create({
   titleContainer: {
     position: "absolute",
     top: 85,
-    left: 10,
+    right: 30,
     backgroundColor: "rgba(255, 255, 255, 0.9)",
-    borderRadius: 20,
-    padding: 10,
-    flexDirection: "row",
+    borderRadius: 30,
+    width: 50,
+    height: 50,
+    paddingTop: 5,
+    paddingLeft: 2,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -136,7 +138,7 @@ export const styles = StyleSheet.create({
     marginRight: 8,
   },
   title: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
     color: "#5D3FD3",
     fontFamily: Platform.OS === "ios" ? "Marker Felt" : "normal",

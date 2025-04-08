@@ -28,7 +28,6 @@ const BathroomReviewModal: React.FC<BathroomReviewModalProps> = ({
   const router = useRouter();
   const handleSubmitSuccess = () => {
     // Close the modal after successful submission
-    router.push("/");
     onClose();
     // You might want to add a callback here to refresh the reviews list
   };

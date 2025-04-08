@@ -31,7 +31,7 @@ type BathroomReviewFormProps = {
   initialValues?: Partial<BathroomReviewData>;
   bathroomId: string; // Required bathroom ID
   submitButtonText?: string;
-  onSubmitSuccess?: () => void;
+  onSubmitSuccess: () => void;
 };
 
 export default function BathroomReviewForm({
@@ -102,7 +102,8 @@ export default function BathroomReviewForm({
       Alert.alert("Success! 🚽", "Your throne review has been recorded!");
 
       // Call the onSubmitSuccess callback if provided
-      onSubmitSuccess?.();
+      onSubmitSuccess();
+      router.push("/");
       queryClient.invalidateQueries();
     } catch (error) {
       console.error("Error submitting bathroom rating:", error);
@@ -187,12 +188,11 @@ export default function BathroomReviewForm({
                   : styles.submitButton
               }
               onPress={() => {
+                onSubmitSuccess();
                 router.push("/login"); // Redirect to login if user is not authenticated
               }}
             >
-              <Text style={styles.submitButtonText}>
-                Sign up to submit your review! 🚽
-              </Text>
+              <Text style={styles.submitButtonText}>Sign up to review!</Text>
             </Pressable>
           )}
 

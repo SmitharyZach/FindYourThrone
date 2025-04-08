@@ -22,11 +22,13 @@ import ThroneMarker from "@/components/ThroneMarker";
 import { debounce } from "lodash";
 import { styles } from "@/components/styles/mapViewStyles";
 import Legend from "@/components/map/legend";
+import HelpPopup from "@/components/HelpPopup";
 
 export default function Index() {
   const [location, setLocation] = useState<LocationObject | null>(null);
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
   const mapRef = useRef<MapView | null>(null);
+  const [showHelpPopup, setShowHelpPopup] = useState(false); // Add state for the help popup
   const queryClient = useQueryClient();
   const [isMapReady, setIsMapReady] = useState(false);
   const { width, height } = Dimensions.get("window");
@@ -141,6 +143,11 @@ export default function Index() {
       }),
     enabled: !!mapRegion?.latitude && !!mapRegion?.longitude,
   });
+
+  // Handle help button press
+  const handleHelpPress = () => {
+    setShowHelpPopup(true);
+  };
 
   // Filter out unverified venues that are already in our verified list
   const filteredUnverifiedVenues = useMemo(() => {
@@ -295,10 +302,20 @@ export default function Index() {
           <Text style={styles.refresh}>Refresh</Text>
         </TouchableOpacity>
 
-        {/* Map Title */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Find Your Throne!</Text>
-        </View>
+        {/* Map Title with Help Button */}
+        <TouchableOpacity
+          style={styles.titleContainer}
+          onPress={handleHelpPress}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.title}>?</Text>
+        </TouchableOpacity>
+
+        {/* Help Popup */}
+        <HelpPopup
+          visible={showHelpPopup}
+          onClose={() => setShowHelpPopup(false)}
+        />
       </View>
     </View>
   );

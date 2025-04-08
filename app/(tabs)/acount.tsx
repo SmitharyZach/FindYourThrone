@@ -171,24 +171,25 @@ Please describe your issue here:
         </LinearGradient>
       )}
 
-      {/* Contact Support Button */}
-      <LinearGradient
-        colors={["#ffffff", "#f8fafc"]}
-        style={styles.card}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <Pressable
-          onPress={handleContactSupport}
-          style={({ pressed }) => [
-            styles.supportButton,
-            { opacity: pressed ? 0.9 : 1 },
-          ]}
+      {!user && (
+        <LinearGradient
+          colors={["#ffffff", "#f8fafc"]}
+          style={styles.card}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         >
-          <Ionicons name="mail" size={18} color="#FFFFFF" />
-          <Text style={styles.supportText}>Contact Support</Text>
-        </Pressable>
-      </LinearGradient>
+          <Pressable
+            onPress={handleLogout}
+            style={({ pressed }) => [
+              styles.createAccountButton,
+              { opacity: pressed ? 0.9 : 1 },
+            ]}
+          >
+            <Ionicons name="person" size={18} color="#FFFFFF" />
+            <Text style={styles.supportText}>Create Account</Text>
+          </Pressable>
+        </LinearGradient>
+      )}
 
       {/* Buy Me a Coffee Button */}
       <LinearGradient
@@ -210,6 +211,27 @@ Please describe your issue here:
       </LinearGradient>
 
       {/* Logout Button */}
+      {user && (
+        <LinearGradient
+          colors={["#ffffff", "#f8fafc"]}
+          style={styles.card}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <Pressable
+            onPress={handleLogout}
+            style={({ pressed }) => [
+              styles.logoutButton,
+              { opacity: pressed ? 0.9 : 1 },
+            ]}
+          >
+            <Ionicons name="log-out" size={18} color="#FFFFFF" />
+            <Text style={styles.logoutText}>Log Out</Text>
+          </Pressable>
+        </LinearGradient>
+      )}
+
+      {/* Contact Support Button */}
       <LinearGradient
         colors={["#ffffff", "#f8fafc"]}
         style={styles.card}
@@ -217,14 +239,14 @@ Please describe your issue here:
         end={{ x: 1, y: 1 }}
       >
         <Pressable
-          onPress={handleLogout}
+          onPress={handleContactSupport}
           style={({ pressed }) => [
-            styles.logoutButton,
+            styles.supportButton,
             { opacity: pressed ? 0.9 : 1 },
           ]}
         >
-          <Ionicons name="log-out" size={18} color="#FFFFFF" />
-          <Text style={styles.logoutText}>{user ? "Log Out" : "Sign Up"}</Text>
+          <Ionicons name="mail" size={18} color="#FFFFFF" />
+          <Text style={styles.supportText}>Contact Support</Text>
         </Pressable>
       </LinearGradient>
 
@@ -366,6 +388,14 @@ const styles = StyleSheet.create({
     color: "#1E293B",
   },
   supportButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "gray",
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  createAccountButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
