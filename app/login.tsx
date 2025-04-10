@@ -16,6 +16,7 @@ import { useAuth } from "../context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GoogleLogin from "@/components/GoogleLogin";
 import { useRouter } from "expo-router";
+import { AppleLogin } from "@/components/AppleLogin";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -76,6 +77,7 @@ const LoginScreen = () => {
           <View style={styles.formCard}>
             <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
             <GoogleLogin />
+            <AppleLogin />
             <View style={styles.emailContainer}>
               <TextInput
                 style={styles.input}

@@ -11,9 +11,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.findyourthrone.app",
+      "usesAppleSignIn": true,
       "config": {
         "googleMapsApiKey": "AIzaSyChKYp6K_zXCLn34DxJusqNmCVwhZ33zDU"
-      }
+      },
+      "appleTeamId": "7797S23ZQY"
     },
     "android": {
       "adaptiveIcon": {
@@ -65,6 +67,9 @@
           "image": "./assets/images/crown1.png",
           "imageWidth": 200
         }
+      ],
+      [
+        "expo-apple-authentication"
       ]
     ],
     "experiments": {

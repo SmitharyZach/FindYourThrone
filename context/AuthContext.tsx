@@ -24,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({
   }) => {},
   signOut: async () => {},
   googleAuth: async (idToken: string) => {},
+  appleAuth: async (idToken: string) => {},
 });
 
 interface AuthContextType {
@@ -46,6 +47,7 @@ interface AuthContextType {
   }) => Promise<any>;
   signOut: () => Promise<void>;
   googleAuth: (idToken: string, email: string) => Promise<any>;
+  appleAuth: (idToken: string) => Promise<any>;
 }
 
 // Auth provider component
@@ -141,6 +143,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return data;
   };
 
+  const appleAuth = async (idToken: string) => {
+    console.log("trying apple auth");
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: "apple",
+      token: idToken,
+    });
+    router.push("/(tabs)");
+
+    return data;
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
@@ -149,7 +162,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, signIn, signUp, signOut, googleAuth }}
+      value={{
+        user,
+        session,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+        googleAuth,
+        appleAuth,
+      }}
     >
       {children}
     </AuthContext.Provider>
