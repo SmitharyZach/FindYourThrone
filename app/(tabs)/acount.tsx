@@ -191,25 +191,6 @@ Please describe your issue here:
         </LinearGradient>
       )}
 
-      {/* Buy Me a Coffee Button */}
-      <LinearGradient
-        colors={["#ffffff", "#f8fafc"]}
-        style={styles.card}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <Pressable
-          onPress={handleBuyMeACoffee}
-          style={({ pressed }) => [
-            styles.coffeeButton,
-            { opacity: pressed ? 0.9 : 1 },
-          ]}
-        >
-          <Ionicons name="cafe" size={18} color="#FFFFFF" />
-          <Text style={styles.coffeeText}>Support the Project</Text>
-        </Pressable>
-      </LinearGradient>
-
       {/* Logout Button */}
       {user && (
         <LinearGradient
