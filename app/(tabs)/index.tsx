@@ -25,7 +25,6 @@ import Legend from "@/components/map/legend";
 import HelpPopup from "@/components/HelpPopup";
 
 export default function Index() {
-  const [location, setLocation] = useState<LocationObject | null>(null);
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
   const mapRef = useRef<MapView | null>(null);
   const [showHelpPopup, setShowHelpPopup] = useState(false); // Add state for the help popup
@@ -184,12 +183,19 @@ export default function Index() {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         console.log("Permission to access location was denied");
+        const initialRegion = {
+          latitude: 35.787743,
+          longitude: -78.644257,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        };
+        console.log("mounted with regions", initialRegion);
+        setMapRegion(initialRegion);
+        setLastFetchedRegion(initialRegion);
         return;
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-
       // Set initial map region based on user's location
       if (location) {
         const { latitude, longitude } = location.coords;
