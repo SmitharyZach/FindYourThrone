@@ -35,53 +35,57 @@ const HelpPopup: React.FC<HelpPopupProps> = ({ visible, onClose }) => {
 
           <ScrollView style={styles.scrollView}>
             <Text style={styles.modalText}>
-              This app helps you find bathrooms nearby with verified user
-              ratings and additional information. Like gender neutral bathrooms,
-              or well stocked toiletries.
+              Discover nearby restrooms with verified ratings, access codes, and
+              essential details like gender-neutral options and toiletry
+              availability—all at your fingertips.
             </Text>
             <Text style={styles.sectionTitle}>Map Features</Text>
             <View style={styles.featureItem}>
               <Text style={styles.featureText}>
-                <Text style={styles.bold}>Verified Bathrooms:</Text> Shown with
-                a crown icon. These have been reviewed by users and helpful
-                information as been added!
+                <Text style={styles.bold}>Verified Bathrooms:</Text> Marked with
+                a royal crown icon. These premium spots have been thoroughly
+                reviewed with essential details added by our community!
+              </Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Text style={styles.featureText}>
+                <Text style={styles.bold}>Unverified Bathrooms:</Text>{" "}
+                Unverified Bathrooms: Identified by a toilet icon. Be a
+                trailblazer, tap to add the first review and claim your status
+                as a bathroom hero!
               </Text>
             </View>
 
             <View style={styles.featureItem}>
               <Text style={styles.featureText}>
-                <Text style={styles.bold}>Unverified Bathrooms:</Text> Shown
-                with a toilet icon. Be the first to rate this bathroom! Tap to
-                add your review and be a bathroom hero.
-              </Text>
-            </View>
-
-            <View style={styles.featureItem}>
-              <Text style={styles.featureText}>
-                <Text style={styles.bold}>Refresh Button:</Text> The map should
-                reload as you scrool but you can hit the refresh button if you
-                do not see the bathrooms you think you should see
+                <Text style={styles.bold}>Refresh Button:</Text> While the map
+                automatically updates as you navigate, tap this button anytime
+                you need to instantly reveal nearby thrones that may not be
+                displaying.
               </Text>
             </View>
 
             <Text style={styles.sectionTitle}>Using the App</Text>
             <Text style={styles.modalText}>
-              1. Pan and zoom the map to explore bathrooms in different areas.
+              1. Navigate your realm: Pan and zoom to discover thrones in any
+              territory.
             </Text>
             <Text style={styles.modalText}>
-              2. Bathrooms come from our database or from Google when they are
-              not verified by our bathroom heros.
+              2. Royal sources: Bathrooms appear from our exclusive database or
+              Google when not yet knighted by our bathroom heroes.
             </Text>
             <Text style={styles.modalText}>
-              3. You can create an account from the account tab!
+              3. Join the kingdom: Create your royal account from the account
+              tab!
             </Text>
             <Text style={styles.modalText}>
-              4. Tap on a bathroom marker to view its details.
+              4. Inspect your options: Tap any marker to reveal a bathroom's
+              secrets.
             </Text>
             <Text style={styles.modalText}>
-              5. Rate and review bathrooms to help other users.
+              5. Share your wisdom: Rate and review to guide fellow
+              throne-seekers on their journeys.
             </Text>
-
             <View style={styles.spacer} />
           </ScrollView>
 
