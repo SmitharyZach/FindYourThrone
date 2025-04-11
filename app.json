@@ -2,7 +2,7 @@
   "expo": {
     "name": "Find Your Throne",
     "slug": "FindYourThrone",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -68,9 +68,7 @@
           "imageWidth": 200
         }
       ],
-      [
-        "expo-apple-authentication"
-      ]
+      ["expo-apple-authentication"]
     ],
     "experiments": {
       "typedRoutes": true

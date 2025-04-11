@@ -242,7 +242,7 @@ Please describe your issue here:
       )}
 
       <View style={styles.versionContainer}>
-        <Text style={styles.versionText}>Find Your Throne v1.1.1</Text>
+        <Text style={styles.versionText}>Find Your Throne v1.1.2</Text>
       </View>
 
       <View style={styles.decorationCircle1} />
